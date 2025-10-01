@@ -122,8 +122,8 @@ end
 
 local function init()
 	system.registerWidget({
-		key = "fsstat",
-		name = "FSStat",
+		key = "fsstatus",
+		name = "FS Status",
 		create = create,
 		wakeup = wakeup,
 		paint = paint,
