@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Coordinate Selector - 800x480px</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+        }
+        #controls {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            max-width: 340px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        #controls h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #4CAF50;
+            padding-left: 0;
+        }
+        .control-group {
+            margin-bottom: 12px;
+            padding-left: 2px;
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+        select, button {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 13px;
+        }
+        select {
+            cursor: pointer;
+        }
+        button {
+            background: #4CAF50;
+            border: none;
+            font-weight: bold;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        #coordinates {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(76, 175, 80, 0.15);
+            border-radius: 4px;
+            font-size: 11px;
+            line-height: 1.8;
+            border: 1px solid #4CAF50;
+            font-family: 'Courier New', monospace;
+        }
+        #coordinates div {
+            margin-bottom: 6px;
+        }
+        #coordinates strong {
+            color: #4CAF50;
+        }
+        .coord-value {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .coord-value:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+        #selectionBox {
+            position: absolute;
+            border: 3px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4);
+            cursor: move;
+            display: none;
+            pointer-events: all;
+            z-index: 500;
+        }
+        #selectionBox::before {
+            content: '800 × 480 px';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .corner {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #4CAF50;
+            z-index: 10;
+            background: transparent;
+        }
+        .corner.tl { 
+            top: -3px; 
+            left: -3px; 
+            cursor: nw-resize;
+            border-right: none;
+            border-bottom: none;
+        }
+        .corner.tr { 
+            top: -3px; 
+            right: -3px; 
+            cursor: ne-resize;
+            border-left: none;
+            border-bottom: none;
+        }
+        .corner.bl { 
+            bottom: -3px; 
+            left: -3px; 
+            cursor: sw-resize;
+            border-right: none;
+            border-top: none;
+        }
+        .corner.br { 
+            bottom: -3px; 
+            right: -3px; 
+            cursor: se-resize;
+            border-left: none;
+            border-top: none;
+        }
+        #instructions {
+            font-size: 11px;
+            color: #888;
+            margin-top: 10px;
+            line-height: 1.5;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+        #copyBtn {
+            background: #2196F3;
+            font-size: 11px;
+            padding: 6px;
+            margin-top: 8px;
+        }
+        #copyBtn:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h2>🛰️ GPS Coordinate Selector</h2>
+
+        <div class="control-group">
+            <label for="mapLayer">Map Type:</label>
+            <select id="mapLayer">
+                <option value="satellite">Satellite (Esri World Imagery)</option>
+                <option value="osm">OpenStreetMap (Standard)</option>
+                <option value="topo">Topographic (OpenTopoMap)</option>
+            </select>
+        </div>
+
+        <button id="createSelection">Create Selection Box (800×480)</button>
+        <button id="captureCoords" disabled>Get GPS Coordinates</button>
+        
+        <div id="coordinates" style="display:none;"></div>
+        
+        <div id="instructions">
+            <strong>Steps:</strong><br>
+            1. Choose map type above<br>
+            2. Navigate to your location (drag/zoom)<br>
+            3. Click "Create Selection Box"<br>
+            4. Position the box over your area<br>
+            5. Click "Get GPS Coordinates"<br>
+            6. Screenshot with Win+Shift+S
+        </div>
+    </div>
+
+    <div id="selectionBox" style="display:none;">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        const ASPECT_RATIO = 800 / 480;
+        const WIDTH = 800;
+        const HEIGHT = 480;
+
+        let map, selectionBox, coordinates, captureBtn, createBtn;
+        let isDragging = false;
+        let isResizing = false;
+        let currentCorner = null;
+        let startX, startY, startLeft, startTop, startWidth, startHeight;
+        let leafletMap = null;
+        let currentLayer = null;
+
+        const layers = {
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri',
+                maxZoom: 19
+            }),
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenTopoMap',
+                maxZoom: 17
+            })
+        };
+
+        window.addEventListener('load', () => {
+            selectionBox = document.getElementById('selectionBox');
+            coordinates = document.getElementById('coordinates');
+            captureBtn = document.getElementById('captureCoords');
+            createBtn = document.getElementById('createSelection');
+            
+            // Initialize map
+            leafletMap = L.map('map', {
+                center: [51.5074, -0.1278], // London
+                zoom: 15,
+                zoomControl: true
+            });
+
+            // Add default layer (satellite)
+            currentLayer = layers.satellite;
+            currentLayer.addTo(leafletMap);
+
+            // Layer selector
+            document.getElementById('mapLayer').addEventListener('change', (e) => {
+                if (currentLayer) {
+                    leafletMap.removeLayer(currentLayer);
+                }
+                currentLayer = layers[e.target.value];
+                currentLayer.addTo(leafletMap);
+            });
+
+            createBtn.addEventListener('click', createSelectionBox);
+            captureBtn.addEventListener('click', captureCoordinates);
+
+            // Selection box dragging
+            selectionBox.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+
+            // Corner resizing
+            document.querySelectorAll('.corner').forEach(corner => {
+                corner.addEventListener('mousedown', startResize);
+            });
+        });
+
+        function createSelectionBox() {
+            const controlsWidth = document.getElementById('controls').offsetWidth;
+            const centerX = (window.innerWidth - WIDTH) / 2;
+            const centerY = (window.innerHeight - HEIGHT) / 2;
+            
+            // Position box to the right of controls panel
+            const leftPosition = Math.max(controlsWidth + 30, centerX);
+            
+            selectionBox.style.left = leftPosition + 'px';
+            selectionBox.style.top = centerY + 'px';
+            selectionBox.style.width = WIDTH + 'px';
+            selectionBox.style.height = HEIGHT + 'px';
+            selectionBox.style.display = 'block';
+            
+            captureBtn.disabled = false;
+            createBtn.textContent = 'Reset Selection';
+        }
+
+        function startDrag(e) {
+            if (e.target.classList.contains('corner')) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = selectionBox.offsetLeft;
+            startTop = selectionBox.offsetTop;
+            e.preventDefault();
+        }
+
+        function startResize(e) {
+            isResizing = true;
+            currentCorner = e.target.classList[1];
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = selectionBox.offsetLeft;
+            startTop = selectionBox.offsetTop;
+            startWidth = selectionBox.offsetWidth;
+            startHeight = selectionBox.offsetHeight;
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                selectionBox.style.left = (startLeft + dx) + 'px';
+                selectionBox.style.top = (startTop + dy) + 'px';
+            } else if (isResizing) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                let newLeft = startLeft;
+                let newTop = startTop;
+
+                if (currentCorner.includes('r')) {
+                    newWidth = startWidth + dx;
+                } else if (currentCorner.includes('l')) {
+                    newWidth = startWidth - dx;
+                    newLeft = startLeft + dx;
+                }
+
+                newHeight = newWidth / ASPECT_RATIO;
+
+                if (currentCorner.includes('t')) {
+                    newTop = startTop + startHeight - newHeight;
+                }
+
+                if (newWidth >= 200 && newHeight >= 120) {
+                    selectionBox.style.width = newWidth + 'px';
+                    selectionBox.style.height = newHeight + 'px';
+                    selectionBox.style.left = newLeft + 'px';
+                    selectionBox.style.top = newTop + 'px';
+                }
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            isResizing = false;
+            currentCorner = null;
+        }
+
+        function captureCoordinates() {
+            if (!leafletMap) return;
+
+            const rect = selectionBox.getBoundingClientRect();
+            
+            // Convert pixel positions to lat/lng using Leaflet's method
+            const topLeft = leafletMap.containerPointToLatLng([rect.left, rect.top]);
+            const bottomRight = leafletMap.containerPointToLatLng([rect.right, rect.bottom]);
+
+            displayCoordinates(topLeft, bottomRight, rect);
+        }
+
+        function displayCoordinates(topLeft, bottomRight, rect) {
+            const tlLat = topLeft.lat.toFixed(7);
+            const tlLng = topLeft.lng.toFixed(7);
+            const brLat = bottomRight.lat.toFixed(7);
+            const brLng = bottomRight.lng.toFixed(7);
+
+            // Convert to DMS format
+            const tlLatDMS = decimalToDMS(topLeft.lat, true);
+            const tlLngDMS = decimalToDMS(topLeft.lng, false);
+            const brLatDMS = decimalToDMS(bottomRight.lat, true);
+            const brLngDMS = decimalToDMS(bottomRight.lng, false);
+
+            const formattedCoords = `Latitude: [${tlLatDMS}] - [${brLatDMS}]\nLongitude: [${tlLngDMS}] - [${brLngDMS}]`;
+
+            coordinates.style.display = 'block';
+            coordinates.innerHTML = `
+                <div><strong>📍 GPS COORDINATES</strong></div>
+                <div style="margin-top:8px;">
+                    <strong>Top-Left:</strong><br>
+                    Lat: <span class="coord-value" title="Decimal">${tlLat}</span> (${tlLatDMS})<br>
+                    Lng: <span class="coord-value" title="Decimal">${tlLng}</span> (${tlLngDMS})
+                </div>
+                <div style="margin-top:8px;">
+                    <strong>Bottom-Right:</strong><br>
+                    Lat: <span class="coord-value" title="Decimal">${brLat}</span> (${brLatDMS})<br>
+                    Lng: <span class="coord-value" title="Decimal">${brLng}</span> (${brLngDMS})
+                </div>
+                <div style="margin-top:8px;">
+                    <strong>Box Size:</strong> ${Math.round(rect.width)} × ${Math.round(rect.height)}px
+                </div>
+            `;
+            
+            // Create button with proper event listener
+            const copyButton = document.createElement('button');
+            copyButton.id = 'copyBtn';
+            copyButton.textContent = '📋 Copy Formatted Coordinates';
+            copyButton.onclick = function() {
+                copyFormattedCoords(formattedCoords);
+            };
+            coordinates.appendChild(copyButton);
+            
+            const instructionDiv = document.createElement('div');
+            instructionDiv.style.cssText = 'margin-top:8px; font-size:10px; color:#888; border-top:1px solid #333; padding-top:8px;';
+            instructionDiv.textContent = '💡 Press Win+Shift+S to capture the selected area';
+            coordinates.appendChild(instructionDiv);
+        }
+
+        function decimalToDMS(decimal, isLatitude) {
+            const absolute = Math.abs(decimal);
+            const degrees = Math.floor(absolute);
+            const minutesDecimal = (absolute - degrees) * 60;
+            const minutes = Math.floor(minutesDecimal);
+            const seconds = ((minutesDecimal - minutes) * 60).toFixed(1);
+            
+            let direction;
+            if (isLatitude) {
+                direction = decimal >= 0 ? 'N' : 'S';
+            } else {
+                direction = decimal >= 0 ? 'E' : 'W';
+            }
+            
+            return `${degrees}°${minutes}\`${seconds}"${direction}`;
+        }
+
+        window.copyToClipboard = function(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                const temp = document.createElement('div');
+                temp.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4CAF50;color:#000;padding:12px 20px;border-radius:8px;font-weight:bold;z-index:10000;';
+                temp.textContent = '✓ Copied: ' + text;
+                document.body.appendChild(temp);
+                setTimeout(() => temp.remove(), 1500);
+            } catch (err) {
+                alert('Copy failed');
+            }
+            
+            document.body.removeChild(textArea);
+        };
+
+        window.copyFormattedCoords = function(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                const temp = document.createElement('div');
+                temp.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4CAF50;color:#000;padding:12px 20px;border-radius:8px;font-weight:bold;z-index:10000;';
+                temp.textContent = '✓ Formatted coordinates copied!';
+                document.body.appendChild(temp);
+                setTimeout(() => temp.remove(), 1500);
+            } catch (err) {
+                alert('Copy failed. Here are your coordinates:\n\n' + text);
+            }
+            
+            document.body.removeChild(textArea);
+        };
+    </script>
+</body>
+</html>
