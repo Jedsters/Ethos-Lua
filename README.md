@@ -5,6 +5,13 @@ I use a FrSky X20S transmitter and have found the need for some widgets and tool
 
 Many of the following will have been created with the help of AI. 
 
+## FS Status Widget
+
+The FS have a blue light in them to indicate when they are active, however in any sort of bright light this becomes pretty much invisible. This widget therefore displays the status of the various FS. In the following example FS3 is active. 
+
+<img width="287" height="122" alt="Screenshot 2025-10-01 194655" src="https://github.com/user-attachments/assets/802f727e-a214-4c4b-9ac1-240ff95fb485" />
+
+
 ## Map downloader tool
 
 Ethos comes with a GPS Map widget which enables maps to be displayed on the transmitter screen with the current location identified on the map.
