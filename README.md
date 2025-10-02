@@ -16,22 +16,23 @@ The FS have a blue light in them to indicate when they are active, however in an
 
 Ethos comes with a GPS Map widget which enables maps to be displayed on the transmitter screen with the current location identified on the map.
 The configuration requires a map image to be specified together with the latitude and longitude of the of left / right and top / bottom of the map. 
-The current Ethos manual at the time of writing (1.6.3) details 2 means to to create the map image, the first is somewhat tricky and long while the second is much simpler and refers the user to the hobby4life website for a tool which largely automates the process. Unfortunately the latter has since gone offline. 
+The current Ethos manual at the time of writing (1.6.3) references https://www.rcgroups.com/forums/showpost.php?p=47392275&postcount=8854 which details 2 methods to create the map image, the first is somewhat tricky and long while the second is much simpler and refers the user to the hobby4life website for a tool which largely automates the process. Unfortunately the latter has since gone offline. 
 
-This tool is therefore a replacement for the hobby4life website largely automating the process. 
+This tool is therefore a replacement for the hobby4life website, largely automating the process. 
 
-The tool is nothing more than some html which the user can store on their device and execute using their preferred browser when required (not all browsers have been tested). 
-When executed the tool shows a satellite map with a GPS Coordinate Selector box at the top left. This allows the user to choose which type of map they want to download from Satellite (ESRI World Imagery), OpenStreetMap (Standard) or Topographic (OpenTopoMap). These were selected in preference to e.g. Google or Bing in that there is no API Key required which makes the tool immediately usable without having to register etc..
+The tool is some html which the user can store on their device and execute using their preferred browser when required (not all browsers have been tested). 
+When executed the tool shows a satellite map with a GPS Coordinate Selector box at the top left. This allows the user to choose which type of map they want to download from: Satellite (ESRI World Imagery); OpenStreetMap (Standard) or Topographic (OpenTopoMap). These were selected in preference to e.g. Google or Bing in that there is no API Key required which makes the tool immediately usable without having to register etc..
 
 To locate the area to download the user would typically select the OSM and navigate to the required area before perhaps changing to one of the other maps, the former having the advantage of having place names marked on it. 
-When the create selection box is selected a box of 800 x 480 pixels is displayed which can then be dragged around the screen as needed. It can also be resized although this perhaps isn't desirable since the X20 requires a map of 800 x 480 pixels. 
+When the create selection box is selected, a box of 800 x 480 pixels is displayed, unless one of the other resolutions is selected, which can then be dragged around the screen as needed. It can also be resized although this perhaps isn't desirable since the supplied resolutions are those for the X20, X14 and X18. 
 
-Once the selected area is correctly identified Get GPS Coordinates can then be selected which will show the latitude and longitude of the area. Copy Formatted Coordinates can then be selected to copy the coordinates which can then be saved along with the map image. 
+Once the selected area is correctly identified Get GPS Coordinates can then be selected which will show the latitude and longitude of the area. Copy Formatted Coordinates can then be selected to copy the coordinates which can then be saved along with the map image. The area selected can then be saved using normal Windows screenshot. Note that although Windows screenshot doesn't give an option to save in .bmp format, if you select Edit in Paint that then does allow the image to be saved in .bpm format. The .bmp can then be transferred to the transmitter and referenced in the Map widget configuration and the copied coordinates also entered into the configuration.
 
-The following shows the initial display and final display (which is certainly not an area suitable for model flying!)
+The following shows the initial display and final display 
 
-<img width="1816" height="1027" alt="Screenshot 2025-10-01 182215" src="https://github.com/user-attachments/assets/93a43303-2b53-4d22-ba52-0bd81df68b00" />
+ <img width="1918" height="1037" alt="Screenshot 2025-10-02 174216" src="https://github.com/user-attachments/assets/673eafcc-bdc6-48da-8b79-b20c28a94fac" />
 
 
 
-<img width="1918" height="1040" alt="Screenshot 2025-10-01 182446" src="https://github.com/user-attachments/assets/cbddcc95-133c-4bc6-b827-1d2ec5a6c030" />
+<img width="1911" height="1038" alt="Screenshot 2025-10-02 174253" src="https://github.com/user-attachments/assets/42c64117-86f8-4598-a9fb-44d6d3117980" />
+
