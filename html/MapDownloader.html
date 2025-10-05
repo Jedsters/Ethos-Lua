@@ -39,6 +39,19 @@
             margin-bottom: 12px;
             padding-left: 2px;
         }
+        .button-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .button-row button {
+            flex: 1;
+            margin-top: 0;
+        }
+        .button-row select {
+            flex: 0 0 120px;
+            margin-top: 0;
+        }
         label {
             display: block;
             font-size: 12px;
@@ -113,7 +126,7 @@
             z-index: 500;
         }
         #selectionBox::before {
-            content: '800 × 480 px';
+            content: attr(data-size);
             position: absolute;
             top: -30px;
             left: 50%;
@@ -195,7 +208,14 @@
         </div>
 
         <button id="createSelection">Create Selection Box (800×480)</button>
-        <button id="captureCoords" disabled>Get GPS Coordinates</button>
+        <div class="button-row">
+            <button id="captureCoords" disabled>Get GPS Coordinates</button>
+            <select id="boxSize">
+                <option value="800x480" selected>800×480</option>
+                <option value="640x360">640×360</option>
+                <option value="480x320">480×320</option>
+            </select>
+        </div>
         
         <div id="coordinates" style="display:none;"></div>
         
@@ -221,11 +241,11 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
-        const ASPECT_RATIO = 800 / 480;
-        const WIDTH = 800;
-        const HEIGHT = 480;
+        let ASPECT_RATIO = 800 / 480;
+        let WIDTH = 800;
+        let HEIGHT = 480;
 
-        let map, selectionBox, coordinates, captureBtn, createBtn;
+        let map, selectionBox, coordinates, captureBtn, createBtn, boxSizeSelect;
         let isDragging = false;
         let isResizing = false;
         let currentCorner = null;
@@ -253,6 +273,7 @@
             coordinates = document.getElementById('coordinates');
             captureBtn = document.getElementById('captureCoords');
             createBtn = document.getElementById('createSelection');
+            boxSizeSelect = document.getElementById('boxSize');
             
             // Initialize map
             leafletMap = L.map('map', {
@@ -272,6 +293,22 @@
                 }
                 currentLayer = layers[e.target.value];
                 currentLayer.addTo(leafletMap);
+            });
+
+            // Box size selector
+            boxSizeSelect.addEventListener('change', (e) => {
+                const [w, h] = e.target.value.split('x').map(Number);
+                WIDTH = w;
+                HEIGHT = h;
+                ASPECT_RATIO = w / h;
+                
+                // Update button text
+                createBtn.textContent = `Create Selection Box (${w}×${h})`;
+                
+                // If box is already visible, update its size
+                if (selectionBox.style.display === 'block') {
+                    createSelectionBox();
+                }
             });
 
             createBtn.addEventListener('click', createSelectionBox);
@@ -301,9 +338,10 @@
             selectionBox.style.width = WIDTH + 'px';
             selectionBox.style.height = HEIGHT + 'px';
             selectionBox.style.display = 'block';
+            selectionBox.setAttribute('data-size', `${WIDTH} × ${HEIGHT} px`);
             
             captureBtn.disabled = false;
-            createBtn.textContent = 'Reset Selection';
+            createBtn.textContent = `Reset Selection (${WIDTH}×${HEIGHT})`;
         }
 
         function startDrag(e) {
@@ -396,7 +434,7 @@
             const brLatDMS = decimalToDMS(bottomRight.lat, true);
             const brLngDMS = decimalToDMS(bottomRight.lng, false);
 
-            const formattedCoords = `Latitude: [${tlLatDMS}] - [${brLatDMS}]\nLongitude: [${tlLngDMS}] - [${brLngDMS}]`;
+            const formattedCoords = `Latitude: [${tlLatDMS}] - [${brLatDMS}]\nLongitude: [${tlLngDMS}] - [${brLngDMS}]\n\nDecimal:\nLatitude: [${tlLat}] - [${brLat}]\nLongitude: [${tlLng}] - [${brLng}]`;
 
             coordinates.style.display = 'block';
             coordinates.innerHTML = `
