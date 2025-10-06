@@ -58,7 +58,7 @@
             margin-bottom: 4px;
             color: #aaa;
         }
-        select, button {
+        select, button, input {
             width: 100%;
             padding: 8px;
             border: 1px solid #444;
@@ -66,6 +66,9 @@
             background: #2a2a2a;
             color: #fff;
             font-size: 13px;
+        }
+        input {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         select {
             cursor: pointer;
@@ -226,7 +229,12 @@
             3. Click "Create Selection Box"<br>
             4. Position the box over your area<br>
             5. Click "Get GPS Coordinates"<br>
-            6. Screenshot with Win+Shift+S
+            6. Screenshot with Win+Shift+S<br>
+            <br>
+            <span style="color:#4CAF50;font-size:10px;">
+                ℹ️ Display scaling: ${Math.round(devicePixelRatio * 100)}%<br>
+                Box auto-adjusted for accurate capture
+            </span>
         </div>
     </div>
 
@@ -241,9 +249,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
+        // Detect display scaling
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        console.log('Device Pixel Ratio (Display Scaling):', devicePixelRatio);
+        
         let ASPECT_RATIO = 800 / 480;
-        let WIDTH = 800;
-        let HEIGHT = 480;
+        let WIDTH = 800 / devicePixelRatio;
+        let HEIGHT = 480 / devicePixelRatio;
 
         let map, selectionBox, coordinates, captureBtn, createBtn, boxSizeSelect;
         let isDragging = false;
@@ -298,11 +310,11 @@
             // Box size selector
             boxSizeSelect.addEventListener('change', (e) => {
                 const [w, h] = e.target.value.split('x').map(Number);
-                WIDTH = w;
-                HEIGHT = h;
+                WIDTH = w / devicePixelRatio;
+                HEIGHT = h / devicePixelRatio;
                 ASPECT_RATIO = w / h;
                 
-                // Update button text
+                // Update button text with actual target size
                 createBtn.textContent = `Create Selection Box (${w}×${h})`;
                 
                 // If box is already visible, update its size
@@ -338,10 +350,14 @@
             selectionBox.style.width = WIDTH + 'px';
             selectionBox.style.height = HEIGHT + 'px';
             selectionBox.style.display = 'block';
-            selectionBox.setAttribute('data-size', `${WIDTH} × ${HEIGHT} px`);
+            
+            // Calculate actual screenshot dimensions
+            const actualWidth = Math.round(WIDTH * devicePixelRatio);
+            const actualHeight = Math.round(HEIGHT * devicePixelRatio);
+            selectionBox.setAttribute('data-size', `${actualWidth} × ${actualHeight} px (target)`);
             
             captureBtn.disabled = false;
-            createBtn.textContent = `Reset Selection (${WIDTH}×${HEIGHT})`;
+            createBtn.textContent = `Reset Selection (${actualWidth}×${actualHeight})`;
         }
 
         function startDrag(e) {
@@ -452,20 +468,24 @@
                 <div style="margin-top:8px;">
                     <strong>Box Size:</strong> ${Math.round(rect.width)} × ${Math.round(rect.height)}px
                 </div>
+                <button id="copyBtn" onclick="copyFormattedCoords(\`${formattedCoords.replace(/`/g, '\\`')}\`)">
+                    📋 Copy Formatted Coordinates
+                </button>
+                <div style="margin-top:8px; font-size:10px; color:#888; border-top:1px solid #333; padding-top:8px;">
+                    💡 Use Win+Shift+S to capture the selected area<br>
+                    Or use the Python script for automated capture
+                </div>
             `;
             
-            // Create button with proper event listener
-            const copyButton = document.createElement('button');
-            copyButton.id = 'copyBtn';
-            copyButton.textContent = '📋 Copy Formatted Coordinates';
+            // Attach proper event listener
+            const copyButton = coordinates.querySelector('#copyBtn');
             copyButton.onclick = function() {
                 copyFormattedCoords(formattedCoords);
             };
-            coordinates.appendChild(copyButton);
             
             const instructionDiv = document.createElement('div');
             instructionDiv.style.cssText = 'margin-top:8px; font-size:10px; color:#888; border-top:1px solid #333; padding-top:8px;';
-            instructionDiv.textContent = '💡 Press Win+Shift+S to capture the selected area';
+            instructionDiv.textContent = '💡 Or use "Capture & Save as BMP" button above';
             coordinates.appendChild(instructionDiv);
         }
 
