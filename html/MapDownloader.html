@@ -127,6 +127,7 @@
             display: none;
             pointer-events: all;
             z-index: 500;
+            box-sizing: content-box;
         }
         #selectionBox::before {
             content: attr(data-size);
@@ -229,12 +230,7 @@
             3. Click "Create Selection Box"<br>
             4. Position the box over your area<br>
             5. Click "Get GPS Coordinates"<br>
-            6. Screenshot with Win+Shift+S<br>
-            <br>
-            <span style="color:#4CAF50;font-size:10px;">
-                ℹ️ Display scaling: ${Math.round(devicePixelRatio * 100)}%<br>
-                Box auto-adjusted for accurate capture
-            </span>
+            6. Screenshot with Win+Shift+S
         </div>
     </div>
 
@@ -465,15 +461,11 @@
                     Lat: <span class="coord-value" title="Decimal">${brLat}</span> (${brLatDMS})<br>
                     Lng: <span class="coord-value" title="Decimal">${brLng}</span> (${brLngDMS})
                 </div>
-                <div style="margin-top:8px;">
-                    <strong>Box Size:</strong> ${Math.round(rect.width)} × ${Math.round(rect.height)}px
-                </div>
-                <button id="copyBtn" onclick="copyFormattedCoords(\`${formattedCoords.replace(/`/g, '\\`')}\`)">
+                <button id="copyBtn">
                     📋 Copy Formatted Coordinates
                 </button>
                 <div style="margin-top:8px; font-size:10px; color:#888; border-top:1px solid #333; padding-top:8px;">
-                    💡 Use Win+Shift+S to capture the selected area<br>
-                    Or use the Python script for automated capture
+                    💡 Use Win+Shift+S to capture the area inside the green box
                 </div>
             `;
             
@@ -482,11 +474,6 @@
             copyButton.onclick = function() {
                 copyFormattedCoords(formattedCoords);
             };
-            
-            const instructionDiv = document.createElement('div');
-            instructionDiv.style.cssText = 'margin-top:8px; font-size:10px; color:#888; border-top:1px solid #333; padding-top:8px;';
-            instructionDiv.textContent = '💡 Or use "Capture & Save as BMP" button above';
-            coordinates.appendChild(instructionDiv);
         }
 
         function decimalToDMS(decimal, isLatitude) {
