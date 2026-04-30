@@ -5,13 +5,37 @@ I use a FrSky X20S transmitter and have found the need for some widgets and tool
 
 Many of the following will have been created with the help of AI. 
 
+  
+##   
 ## FS Status Widget
 
 The FS have a blue light in them to indicate when they are active, however in any sort of bright light this becomes pretty much invisible. This widget therefore displays the status of the various FS. In the following example FS3 is active. 
 
-<img width="287" height="122" alt="Screenshot 2025-10-01 194655" src="https://github.com/user-attachments/assets/802f727e-a214-4c4b-9ac1-240ff95fb485" />
+<img width="287" height="122" alt="Screenshot 2025-10-01 194655" src="https://github.com/user-attachments/assets/802f727e-a214-4c4b-9ac1-240ff95fb485" />  
 
 
+##  
+## TouchOnOff Widget  
+
+This provides a simple two-button On/Off touch widget for FrSky Ethos. 
+It displays an ON touch button and an OFF touch button inside the widget area. Both brighten when touched.
+The Widget title and button text can be changed in the Widget configuration dialog.
+Touching ON outputs +100% (1024) at the lua source and touching OFF outputs -100% (-1024) at the lua source.
+For more details see the comments in the code. 
+
+As coded this widget can be used up to 10 times within a single model as 10 widgets are pre-registered, however if more are required then 
+just change the MAX_WIDGETS value. The configuration advises which lua source is being used so you know which source to use in mixes, LS etc..
+
+<img width="796" height="474" alt="image" src="https://github.com/user-attachments/assets/052c571d-b19b-49a2-a19f-fa2ce92fb8a1" />
+
+###
+### Configuration options
+###
+
+<img width="796" height="476" alt="image" src="https://github.com/user-attachments/assets/69429fa0-0bc9-408c-a408-50cca990a680" />  
+
+
+##  
 ## Map downloader tool
 
 Ethos comes with a GPS Map widget which enables maps to be displayed on the transmitter screen with the current location identified on the map.
@@ -30,9 +54,12 @@ Once the selected area is correctly identified Get GPS Coordinates can then be s
 
 The following shows the initial display and final display 
 
- <img width="1918" height="1037" alt="Screenshot 2025-10-02 174216" src="https://github.com/user-attachments/assets/673eafcc-bdc6-48da-8b79-b20c28a94fac" />
+ <img width="1918" height="1037" alt="Screenshot 2025-10-02 174216" src="https://github.com/user-attachments/assets/673eafcc-bdc6-48da-8b79-b20c28a94fac" />  
 
 
 
 <img width="1911" height="1038" alt="Screenshot 2025-10-02 174253" src="https://github.com/user-attachments/assets/42c64117-86f8-4598-a9fb-44d6d3117980" />
 
+
+##
+##
