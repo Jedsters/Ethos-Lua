@@ -35,6 +35,20 @@ just change the MAX_WIDGETS value. The configuration advises which lua source is
 <img width="796" height="476" alt="image" src="https://github.com/user-attachments/assets/69429fa0-0bc9-408c-a408-50cca990a680" />  
 
 
+##
+## Battery Consumption Tracker
+
+For those who fly motorised gliders, a LiPo may last multiple flights or even all day. However Ethos doesn't keep track of how much battery you use across multiple flights. The Battery Consumption widget is therefore designed to do this. 
+It will track the consumption on the current flight (Flight) together with the total consumption across multiple flights on the same day (Total). On a new day both are automatically reset to zero. There is also a touch Reset icon to enable you to reset both to zero should you change battery part way through a days flying. 
+
+<img width="255" height="111" alt="image" src="https://github.com/user-attachments/assets/591491c6-1b01-49ac-b610-f510fd663d76" />  
+
+The sensor is selectable in the configuration so this could be used for other sensors too. Whether units are displayed on the title line or beside the values is also selectable, however on the title line may be preferable for large batteries with a small widget area. 
+
+<img width="793" height="250" alt="image" src="https://github.com/user-attachments/assets/2b780faf-1e88-4f82-ad6a-991f0c05b3e1" />
+
+
+
 ##  
 ## Map downloader tool
 
