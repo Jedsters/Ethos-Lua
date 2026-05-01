@@ -48,6 +48,26 @@ The sensor is selectable in the configuration so this could be used for other se
 <img width="793" height="250" alt="image" src="https://github.com/user-attachments/assets/2b780faf-1e88-4f82-ad6a-991f0c05b3e1" />
 
 
+##
+## Layout Options
+
+Ethos enables you to display a number of items on the screen at once, however I wanted more information on a single screen (in particular Min and Max values).
+
+I have therefore created a widget which allows 2 to 4 items to be displayed within a single widget area in a variety of layouts, e.g. 2 values in 2 rows, 2 values in 2 columns, 3 values in 2 rows, 3 values in 2 columns, 4 values or 2 to the left of the area.
+
+<img width="797" height="470" alt="image" src="https://github.com/user-attachments/assets/22062cd5-a43f-488c-a2ce-092a8def1d77" />
+
+##
+
+The type of layout can be selected in the configuration, each source can be individually selected as can the size of font for the title and each source. Some adjustment may be needed for font sizes to ensure all of the information fits on the screen even when some of the values get high. 
+
+##
+
+<img width="792" height="474" alt="image" src="https://github.com/user-attachments/assets/b0b2a7f1-529b-4784-9901-264cd43a319f" />
+
+
+ 
+
 
 ##  
 ## Map downloader tool
